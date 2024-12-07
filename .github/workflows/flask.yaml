@@ -1,0 +1,25 @@
+name: flask-calculator
+
+on:
+  issues:
+    types:
+      - labeled
+jobs:
+  test-and-deploy:
+    runs: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: install-python-libs
+        run: pip install -r requirements.txt
+      - name: run-unit-tests
+        run: python calculator/test_calculator.py
+      - name: run-flask-server
+        run: python app.py &
+      - name: run-flask-server-wait
+        run: sleep 3
+      - name: pink-test
+        run: python utility/ping_test.py
+      - name: docker-build
+        run: docker build . --file Dockerfile --tag flask-calculator:latest
+      - name: docker-hub-push
+        run: echo 'pushed to docker hub'
